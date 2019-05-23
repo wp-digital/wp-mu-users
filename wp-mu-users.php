@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MU Users
  * Description: Creates separate users database tables for each site in WordPress network.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Plugin URI: https://github.com/innocode-digital/wp-mu-users
  * Author: Innocode
  * Author URI: https://innocode.com/
@@ -19,5 +19,6 @@ if ( get_current_blog_id() > 1 ) {
 
     WPMUUsers\Db::register();
     WPMUUsers\Users::register();
+    WPMUUsers\Url::register();
     WPMUUsers\Admin::register();
 }
