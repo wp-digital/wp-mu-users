@@ -1,0 +1,29 @@
+{
+    "name": "innocode-digital/wp-mu-users",
+    "version": "1.0.0",
+    "type": "wordpress-mu-plugin",
+    "license": "MIT",
+    "keywords": ["wordpress", "plugins"],
+    "autoload": {
+        "psr-4": {
+            "Innocode\\WPMUUsers\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Innocode",
+            "email": "post@innocode.no",
+            "homepage": "https://innocode.com/"
+        }, {
+            "name": "Viktor Kuliebiakin",
+            "email": "kuliebiakin@gmail.com"
+        }
+    ],
+    "require": {
+        "phpmyadmin/sql-parser": "^5.0",
+        "wp-cli/search-replace-command": "^2.0"
+    },
+    "extra": {
+        "installer-name": "wp-mu-users"
+    }
+}
