@@ -68,11 +68,19 @@ final class Db
 
     public static function register()
     {
-        static::maybe_create_tables();
-        static::switch_tables();
+        static::init();
+        static::switch_cache_groups();
 
         add_filter( 'query', [ __CLASS__, 'filter_query' ] );
         add_filter( 'wpmu_drop_tables', [ __CLASS__, 'filter_site_tables' ], 10, 2 );
+
+        add_action( 'switch_blog', [ __CLASS__, 'init' ] );
+    }
+
+    public static function init()
+    {
+        static::maybe_create_tables();
+        static::switch_tables();
     }
 
     public static function maybe_create_tables()
@@ -152,6 +160,32 @@ final class Db
 
         $wpdb->users = static::get( 'users' );
         $wpdb->usermeta = static::get( 'usermeta' );
+
+        $wpdb->tables[] = 'users';
+        $wpdb->tables[] = 'usermeta';
+
+        foreach ( [
+            'users',
+            'usermeta',
+        ] as $table ) {
+            if ( false !== ( $index = array_search(
+                $table, $wpdb->global_tables
+            ) ) ) {
+                unset( $wpdb->global_tables[ $index ] );
+            }
+        }
+    }
+
+    public static function switch_cache_groups()
+    {
+        global $wp_object_cache;
+
+        $wp_object_cache->global_groups['users'] = 0;
+        $wp_object_cache->global_groups['userlogins'] = 0;
+        $wp_object_cache->global_groups['usermeta'] = 0;
+        $wp_object_cache->global_groups['user_meta'] = 0;
+        $wp_object_cache->global_groups['useremail'] = 0;
+        $wp_object_cache->global_groups['userslugs'] = 0;
     }
 
     /**
