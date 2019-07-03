@@ -69,7 +69,7 @@ final class Db
     public static function register()
     {
         static::init();
-        static::switch_cache_groups();
+        static::cache_add_non_persistent_groups();
 
         add_filter( 'query', [ __CLASS__, 'filter_query' ] );
         add_filter( 'wpmu_drop_tables', [ __CLASS__, 'filter_site_tables' ], 10, 2 );
@@ -176,16 +176,16 @@ final class Db
         }
     }
 
-    public static function switch_cache_groups()
+    public static function cache_add_non_persistent_groups()
     {
-        global $wp_object_cache;
-
-        $wp_object_cache->global_groups['users'] = 0;
-        $wp_object_cache->global_groups['userlogins'] = 0;
-        $wp_object_cache->global_groups['usermeta'] = 0;
-        $wp_object_cache->global_groups['user_meta'] = 0;
-        $wp_object_cache->global_groups['useremail'] = 0;
-        $wp_object_cache->global_groups['userslugs'] = 0;
+        wp_cache_add_non_persistent_groups( [
+            'users',
+            'userlogins',
+            'usermeta',
+            'user_meta',
+            'useremail',
+            'userslugs',
+        ] );
     }
 
     /**
