@@ -3,6 +3,7 @@
 namespace Innocode\WPMUUsers\Filters;
 
 use Innocode\WPMUUsers\Db;
+use Innocode\WPMUUsers\Users;
 use PhpMyAdmin\SqlParser;
 
 /**
@@ -17,8 +18,26 @@ class Select extends AbstractFilter
     public function run()
     {
         foreach ( $this->statement->from as $key => $from ) {
-            if ( ! Db::is_local_users_table( $from->table ) ) {
+            if ( ! Db::is_local_table( $from->table ) ) {
                 continue;
+            }
+
+            if ( Db::is_local_usermeta_table( $from->table ) ) {
+                $id = Db::parse_identifier( $this->statement );
+
+                if (
+                    false !== $id &&
+                    Users::is_global_user_id( $id )
+                ) {
+                    $query = $this->statement->build();
+                    $query = Db::replace_tables( $query );
+                    $parsed = new SqlParser\Parser( $query );
+
+                    if ( isset( $parsed->statements[0] ) ) {
+                        $this->statement = $parsed->statements[0];
+                        continue;
+                    }
+                }
             }
 
             $this->_order_clauses_to_expr();

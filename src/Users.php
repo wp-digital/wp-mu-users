@@ -64,7 +64,7 @@ final class Users
 
                 if (
                     $cap == 'edit_user' &&
-                    $args[0] >= MU_USERS_OFFSET
+                    static::is_local_user_id( $args[0] )
                 ) {
                     $caps[ $key ] = 'edit_users';
 
@@ -86,7 +86,7 @@ final class Users
 
                 if (
                     $cap == 'remove_user' &&
-                    $args[0] < MU_USERS_OFFSET
+                    static::is_global_user_id( $args[0] )
                 ) {
                     $caps[ $key ] = 'do_not_allow';
 
@@ -108,7 +108,7 @@ final class Users
 
                 if (
                     $cap == 'delete_user' &&
-                    $args[0] >= MU_USERS_OFFSET
+                    static::is_local_user_id( $args[0] )
                 ) {
                     $caps[ $key ] = 'delete_users';
 
@@ -125,7 +125,7 @@ final class Users
                 if (
                     ! is_super_admin( $user_id ) &&
                     $cap == 'promote_user' &&
-                    $args[0] < MU_USERS_OFFSET
+                    static::is_global_user_id( $args[0] )
                 ) {
                     $caps[ $key ] = 'do_not_allow';
 
@@ -175,7 +175,7 @@ final class Users
     {
         global $user_id;
 
-        return $user_id >= MU_USERS_OFFSET;
+        return static::is_local_user_id( $user_id );
     }
 
     /**
@@ -213,7 +213,7 @@ final class Users
             $user = wp_get_current_user();
 
             if (
-                $user->ID >= MU_USERS_OFFSET &&
+                static::is_local_user_id( $user->ID ) &&
                 in_array( $user->user_login, $super_admins )
             ) {
                 $super_admins = array_diff( $super_admins, [
@@ -238,7 +238,7 @@ final class Users
     {
         global $wpdb;
 
-        if ( $user_id < MU_USERS_OFFSET ) {
+        if ( static::is_global_user_id( $user_id ) ) {
             return;
         }
 
@@ -252,7 +252,7 @@ final class Users
      */
     public static function remove( $user_id, $blog_id )
     {
-        if ( $user_id < MU_USERS_OFFSET || $blog_id <= 1 ) {
+        if ( static::is_global_user_id( $user_id ) || $blog_id <= 1 ) {
             return;
         }
 
@@ -270,5 +270,25 @@ final class Users
         wpmu_delete_user( $user_id );
 
         add_filter( 'remove_user_from_blog', [ __CLASS__, 'remove' ], 10, 2 );
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return bool
+     */
+    public static function is_local_user_id( $id )
+    {
+        return $id >= MU_USERS_OFFSET;
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return bool
+     */
+    public static function is_global_user_id( $id )
+    {
+        return $id > 0 && $id < MU_USERS_OFFSET;
     }
 }

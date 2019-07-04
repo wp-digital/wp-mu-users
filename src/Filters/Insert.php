@@ -3,6 +3,7 @@
 namespace Innocode\WPMUUsers\Filters;
 
 use Innocode\WPMUUsers\Db;
+use Innocode\WPMUUsers\Users;
 use PhpMyAdmin\SqlParser;
 
 /**
@@ -33,8 +34,7 @@ class Insert extends AbstractFilter
 
         if (
             false !== $id &&
-            $id > 0 &&
-            $id < MU_USERS_OFFSET
+            Users::is_global_user_id( $id )
         ) {
             $dest->table = Db::replace_tables( $dest->table );
             $dest->expr = Db::replace_tables( $dest->expr );

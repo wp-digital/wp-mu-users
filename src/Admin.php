@@ -39,10 +39,7 @@ final class Admin
         if ( ! wp_doing_ajax() ) {
             $user = wp_get_current_user();
 
-            if (
-                $user->ID > 0 &&
-                $user->ID < MU_USERS_OFFSET
-            ) {
+            if ( Users::is_global_user_id( $user->ID ) ) {
                 $count_duplicates = Db::suppress_query_filter( function ( $user_login ) {
                     global $wpdb;
 
@@ -72,7 +69,7 @@ final class Admin
 
     public static function bar_menus()
     {
-        if ( get_current_user_id() >= MU_USERS_OFFSET ) {
+        if ( Users::is_local_user_id( get_current_user_id() ) ) {
             remove_action( 'admin_bar_menu', 'wp_admin_bar_my_sites_menu', 20 );
         }
     }
@@ -82,7 +79,7 @@ final class Admin
         global $submenu;
 
         if (
-            get_current_user_id() >= MU_USERS_OFFSET &&
+            Users::is_local_user_id( get_current_user_id() ) &&
             isset( $submenu['index.php'][5] )
         ) {
             unset( $submenu['index.php'][5] );

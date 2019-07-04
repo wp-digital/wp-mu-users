@@ -203,7 +203,7 @@ final class Db
             return $wpdb->get_var( "SELECT ID from $table ORDER BY ID ASC LIMIT 1" );
         } );
 
-        return is_null( $id ) || $id >= MU_USERS_OFFSET;
+        return is_null( $id ) || Users::is_local_user_id( $id );
     }
 
     /**
@@ -213,10 +213,87 @@ final class Db
      */
     public static function is_local_users_table( $table )
     {
+        return $table === static::get( 'users' );
+    }
+
+    /**
+     * @param string $table
+     *
+     * @return bool
+     */
+    public static function is_local_usermeta_table( $table )
+    {
+        return $table === static::get( 'usermeta' );
+    }
+
+    /**
+     * @param string $table
+     *
+     * @return bool
+     */
+    public static function is_local_table( $table )
+    {
         return in_array(
             $table,
             static::get( 'tables' )
         );
+    }
+
+    /**
+     * @param $statement
+     *
+     * @return bool|int
+     */
+    public static function parse_identifier( $statement )
+    {
+        foreach ( $statement->where as $where ) {
+            if ( isset( $where->identifiers[0] ) ) {
+                $identifier = $where->identifiers[0];
+
+                switch ( mb_strtolower( $identifier ) ) {
+                    case 'id':
+                    case 'user_id':
+                        $escaped_identifier = SqlParser\Context::escape( $identifier );
+
+                        if ( preg_match(
+                            "/^$escaped_identifier\s*=\s*(\d+)$/",
+                            trim( $where->expr ),
+                            $match
+                        ) ) {
+                            return intval( $match[1] );
+                        }
+
+                        if ( preg_match(
+                            "/^$identifier\s+IN\s+\((\d+)\)$/i",
+                            trim( $where->expr ),
+                            $match
+                        ) ) {
+                            return intval( $match[1] );
+                        }
+
+                        break;
+                    case 'user_login':
+                    case 'user_email':
+                    case 'user_nicename':
+                        if ( ! isset( $where->identifiers[1] ) ) {
+                            break;
+                        }
+
+                        $value = $where->identifiers[1];
+                        $field = $identifier == 'user_nicename'
+                            ? 'slug'
+                            : preg_replace( '/^user_(.*)$/', '$1', $identifier );
+
+                        if ( false !== ( $user = get_user_by( $field, $value ) ) ) {
+                            return $user->ID;
+                        }
+
+                        break;
+                }
+            }
+        }
+
+        return false;
     }
 
     public static function replace_tables( $query )
