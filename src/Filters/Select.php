@@ -59,16 +59,22 @@ class Select extends AbstractFilter
 
     protected function _order_clauses_to_expr()
     {
-        if ( isset( $this->statement->order ) ) {
-            $expr_columns = array_column( $this->statement->expr, 'column' );
+        if ( ! isset( $this->statement->order ) ) {
+            return;
+        }
 
-            foreach ( $this->statement->order as $order ) {
-                if ( false === array_search(
-                    $order->expr->column,
-                    $expr_columns
-                ) ) {
-                    $this->statement->expr[] = $order->expr;
-                }
+        $expr_columns = array_column( $this->statement->expr, 'column' );
+
+        if ( false !== array_search( null, $expr_columns ) ) {
+            return;
+        }
+
+        foreach ( $this->statement->order as $order ) {
+            if ( false === array_search(
+                $order->expr->column,
+                $expr_columns
+            ) ) {
+                $this->statement->expr[] = $order->expr;
             }
         }
     }
