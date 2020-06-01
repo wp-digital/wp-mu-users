@@ -10,7 +10,7 @@
  * License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
  */
 
-require_once __DIR__ . '/build/vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 use Innocode\WPMUUsers;
 
