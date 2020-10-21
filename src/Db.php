@@ -324,9 +324,9 @@ final class Db
         if ( isset( $parsed->statements[0] ) ) {
             $statement = $parsed->statements[0];
 
-	        if( Helpers::get_class_short_name( $statement ) == 'TransactionStatement') {
-	        	return $query;
-	        }
+            if( Helpers::get_class_short_name( $statement ) == 'TransactionStatement') {
+                return $query;
+            }
 
             $statement = static::_filter_statement( $statement );
             $query = $statement->build();

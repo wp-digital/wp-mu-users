@@ -35,7 +35,8 @@ final class Url
             'login_post',
         ] ) || in_array( $path, [
             '/wp-activate.php'
-            ] ) ) {
+            ] )
+        ) {
 
             return site_url( $path, $scheme );
         }
