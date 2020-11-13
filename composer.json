@@ -1,6 +1,6 @@
 {
     "name": "innocode-digital/wp-mu-users",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "type": "wordpress-mu-plugin",
     "license": "MIT",
     "keywords": ["wordpress", "plugins"],
