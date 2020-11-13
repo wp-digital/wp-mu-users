@@ -33,7 +33,11 @@ final class Url
         if ( in_array( $scheme, [
             'login',
             'login_post',
-        ] ) ) {
+        ] ) || in_array( $path, [
+            '/wp-activate.php'
+            ] )
+        ) {
+
             return site_url( $path, $scheme );
         }
 
