@@ -15,22 +15,25 @@ use PhpMyAdmin\SqlParser;
  */
 class Update extends AbstractFilter
 {
+    /**
+     * @return bool
+     */
     public function run()
     {
         $tables = $this->statement->tables;
 
         if ( ! isset( $tables[0] ) ) {
-            return;
+            return false;
         }
 
         $table = $tables[0];
 
         if ( ! isset( $table->table ) ) {
-            return;
+            return false;
         }
 
         if ( ! Db::is_local_table( $table->table ) ) {
-            return;
+            return false;
         }
 
         $id = Db::parse_identifier( $this->statement );
@@ -42,5 +45,7 @@ class Update extends AbstractFilter
             $table->table = Db::replace_tables( $table->table );
             $table->expr = Db::replace_tables( $table->expr );
         }
+
+        return true;
     }
 }

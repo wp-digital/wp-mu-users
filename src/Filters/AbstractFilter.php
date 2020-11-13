@@ -46,5 +46,8 @@ abstract class AbstractFilter
         }
     }
 
+    /**
+     * @return bool
+     */
     abstract public function run();
 }

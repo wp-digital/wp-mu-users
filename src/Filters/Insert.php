@@ -15,10 +15,13 @@ use PhpMyAdmin\SqlParser;
  */
 class Insert extends AbstractFilter
 {
+    /**
+     * @return bool
+     */
     public function run()
     {
         if ( ! isset( $this->statement->into->dest ) ) {
-            return;
+            return false;
         }
 
         $dest = $this->statement->into->dest;
@@ -27,7 +30,7 @@ class Insert extends AbstractFilter
             ! isset( $dest->table ) ||
             $dest->table != Db::get( 'usermeta' )
         ) {
-            return;
+            return false;
         }
 
         $id = $this->_parse_columns();
@@ -39,6 +42,8 @@ class Insert extends AbstractFilter
             $dest->table = Db::replace_tables( $dest->table );
             $dest->expr = Db::replace_tables( $dest->expr );
         }
+
+        return true;
     }
 
     private function _parse_columns()

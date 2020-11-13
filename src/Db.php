@@ -328,8 +328,9 @@ final class Db
 	        	return $query;
 	        }
 
-            $statement = static::_filter_statement( $statement );
-            $query = $statement->build();
+            if ( false !== ( $statement = static::_filter_statement( $statement ) ) ) {
+                $query = $statement->build();
+            }
         }
 
         return $query;
@@ -401,7 +402,10 @@ final class Db
     private static function _run_filter( Filters\AbstractFilter $filter, $statement )
     {
         $filter->statement = $statement;
-        $filter->run();
+
+        if ( ! $filter->run() ) {
+            return false;
+        }
 
         return $filter->statement;
     }

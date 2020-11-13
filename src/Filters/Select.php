@@ -15,10 +15,17 @@ use PhpMyAdmin\SqlParser;
  */
 class Select extends AbstractFilter
 {
+    /**
+     * @return bool
+     */
     public function run()
     {
+        $skipped = 0;
+
         foreach ( $this->statement->from as $key => $from ) {
             if ( ! Db::is_local_table( $from->table ) ) {
+                $skipped++;
+
                 continue;
             }
 
@@ -55,6 +62,8 @@ class Select extends AbstractFilter
 
             $this->_count();
         }
+
+        return count( $this->statement->from ) != $skipped;
     }
 
     protected function _order_clauses_to_expr()
